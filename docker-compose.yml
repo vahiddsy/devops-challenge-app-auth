@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  app:
+    image: ${IMAGE?Variable not set}:${TAG?Variable not set}
+    container_name: Authentiq
+      #ports:
+      #  - target: 2000
+      #    published: 8096
+      #    protocol: tcp
+      #    mode: ingress
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.auth_app.rule=Host(`${HOST?Variable not set}`)"
+        - 'traefik.http.services.auth_app.loadbalancer.server.port=2000'  
+        - "traefik.http.routers.auth_app.entrypoints=web"
+      mode: replicated
+      replicas: 2
+      update_config:
+        failure_action: rollback
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: on-failure
+
+    healthcheck:
+      test: curl -X GET --fail http://localhost:2000/authentiq/v1/heartbeat || exit 1
+      interval: 40s
+      timeout: 10s
+      retries: 3
+      start_period: 20s      
+    env_file: .env
+    environment:
+      - TZ=Asia/Tehran
+      - NODE_ENV=production 
+    networks:
+      - app
+      - traefik-public
+networks:
+  app:
+   external: true
+  traefik-public:
+   external: true

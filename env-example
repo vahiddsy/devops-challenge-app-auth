@@ -1,0 +1,6 @@
+IMAGE=done/auth
+TAG=v0.2
+HOST=done-auth.example.com
+AUTHENTIQ_DB_HOST=mongodb_mongodb
+AUTHENTIQ_DB_USERNAME=root
+AUTHENTIQ_DB_PASSWORD=password
